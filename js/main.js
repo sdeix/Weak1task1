@@ -131,6 +131,7 @@ Vue.component("product-review", {
         required: true
       }
    },
+
    
   })
   
@@ -162,8 +163,11 @@ Vue.component("product", {
      <button v-on:click="removeFromCart">Remove from cart</button>
      <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
      <ul v-for="size in sizes">
-        <li>{{size}}</li>
+        <div class="size">
+        <li  v-on:click="updatesize(size)">{{size}}</li>
+        </div>
      </ul>
+     <p>Выбран размер: {{selected_size}}</p>
 
      
     </div>
@@ -173,6 +177,7 @@ Vue.component("product", {
 
 
     <product-tabs :shipping="shipping" :reviews="reviews"></product-tabs>
+    <button v-on:click="removeReviews">Remove reviews</button>
   </div>
   
 
@@ -196,6 +201,7 @@ Vue.component("product", {
       inventory: 100,
       onSale: true,
       reviews: [],
+      details: ["80% cotton", "20% polyester", "Gender-neutral"],
       variants: [
         {
           variantId: 2234,
@@ -210,6 +216,7 @@ Vue.component("product", {
           variantQuantity: 1,
         },
       ],
+      selected_size: "S",
       sizes: ["S", "M", "L", "XL", "XXL", "XXXL"],
     };
   },
@@ -217,15 +224,24 @@ Vue.component("product", {
     removeFromCart() {
       this.$emit(
         "remove-from-cart",
-        this.variants[this.selectedVariant].variantId
+        this.variants[this.selectedVariant].variantId,this.selected_size
       );
     },
     addToCart() {
-      this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId);
+      this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId,this.variants[this.selectedVariant].variantColor,this.selected_size);
     },
     updateProduct(index) {
       this.selectedVariant = index;
     },
+    removeReviews(){
+      console.log(this.reviews)
+      this.reviews = [];
+      localStorage.removeItem('reviews')
+    },
+    updatesize(size){
+      this.selected_size = size
+      console.log(this.selected_size)
+    }
   },
   computed: {
     title() {
@@ -252,9 +268,21 @@ Vue.component("product", {
     },
   },
   mounted() {
+    if (localStorage.getItem('reviews')) {
+      try {
+        this.reviews = JSON.parse(localStorage.getItem('reviews'));
+      } catch(e) {
+        localStorage.removeItem('reviews');
+      }
+    }
     eventBus.$on('review-submitted', productReview => {
         this.reviews.push(productReview)
+
+        const parsed = JSON.stringify(this.reviews);
+        localStorage.setItem('reviews', parsed);
+
     })
+    
  }, 
 });
 
@@ -278,15 +306,19 @@ let app = new Vue({
     cart: [],
   },
   methods: {
-    updateplusCart(id) {
-      this.cart.push(id);
+    updateplusCart(id,color,size) {
+      this.cart.push([id,color,size]);
     },
-    updateminusCart(id) {
-      console.log("Удалён объект ", id);
+    updateminusCart(id,size) {
+      console.log("Удалён объект ", id, size);
       let index = this.cart.indexOf(id);
-      if (index !== -1) {
-        this.cart.splice(index, 1);
+      for(i in this.cart){
+        if(this.cart[i][0]==id && this.cart[i][2]==size){
+          this.cart.splice(i, 1);
+          break;
+        }
       }
+
     },
   },
 });

@@ -40,12 +40,19 @@ img {
 }
 
 .cart {
-    margin-right: 25px;
+    margin: 25px;
     float: right;
     border: 1px solid #d8d8d8;
     padding: 5px 20px;
-}
+    list-style-type: none;
+    width: 20%;
 
+
+}
+.item{
+    padding-top: 10px;
+    list-style-type: none;
+}
 button {
     margin-top: 30px;
     border: none;
@@ -90,4 +97,11 @@ textarea {
 
 .outofstock{
     text-decoration: line-through
+}
+
+.size{
+    border: 1px solid black;
+    width: 50px;
+    border-radius: 3px;
+    text-align: center;
 }

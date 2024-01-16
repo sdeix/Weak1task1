@@ -15,7 +15,10 @@
   <body>
     <div id="app">
         <div class="cart">
-            <p>Cart({{ cart }})</p>
+            <p>Cart({{ cart.length }})</p>
+            <ul>
+              <li class ="item"v-for="item in cart">{{ item }}</li>
+            </ul>
             
          </div>
      <product :premium="premium" @add-to-cart="updateplusCart" @remove-from-cart="updateminusCart"></product>
